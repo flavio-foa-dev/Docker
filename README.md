@@ -393,6 +393,31 @@ docker container run --name <nome-da-sua-escolha> <imagem>:<tag>
 ```
 docker container run --rm <imagem>:<tag>
 ```
+### O parâmetro `-d` (de `--detach` , desacoplado em português) rodará esse `container` em segundo plano*:
+```
+docker container run -d <imagem>:<tag>
+```
+* Trabalhar em segundo plano significa que a aplicação está rodando, porém de forma assíncrona ao comando, ou seja, embora não esteja visível, o processo está lá, funcionando por de trás dos panos. É possível validar isso com o comando `docker ps -a` .
+O comando `-d` em outros aplicativos e serviços também pode estar associado ao conceito de `daemon` , que também é uma forma de se referenciar aplicativos que estão funcionando em segundo plano.
+No exemplo da imagem ubuntu, faz sentido passar o parâmetro `-d` associado ao `-it` como em: `docker` `container run -dit ubuntu` , o que manterá o `container ativo` em segundo plano, já com um terminal disponível para acesso;
+
+
+### (Comando antigo) * Abreviação do comando `docker container run` :
+```
+docker run <parâmetros> <imagem>:<tag>
+```
+* Nas versões mais novas, o Docker vem adotando comandos mais verbosos, nos quais identificamos a entidade ( `container , image` , etc) que estamos trabalhando, antes de realizar o comando (o que o torna mais semântico).
+Isso não significa, contudo, que os comandos das primeiras versões estejam depreciados (caíram em desuso) , mas pode ser um alerta para futuras versões.
+
+## Criar um `container` sem executá-lo
+### Cria um `container` com a imagem de referência, mas não o executa imediatamente:
+```
+docker container create <parâmetros> <imagem>:<tag>
+```
+
+
+
+
 
 
 
