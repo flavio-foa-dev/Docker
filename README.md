@@ -372,6 +372,29 @@ Passemos um resumo do que foi visto, complemtando com os **comandos adicionais q
 * `docker <comando> <subcomando> <parâmetros> ` é o farmato padão para comandos não-abreviados no CLI;
 * Utilize o parametro `--help` no `<comando> ` ou ` <subcomando> ` para ter relação completa do que pode ser executado a parti deles;
 
+  Exemplo `Docker container --helpe` , ou `docker container run --help `.
+
+* Os <parâmetros> são opcionais na execução dos comandos;
+* O conteúdo faz referência a **documentação oficial dos comandos no Docker Docs**
+
+## criar e rodar um container
+
+### Deve criar um novo  `container` e roda-lo em seguida:
+```
+docker container run <parâmetros> <imagem>:<tag>
+```
+
+### O parâmetro `--name` define um `<nome-da-sua-escolha>` para aquele `container` (ao invés de um nome aleatório)
+```
+docker container run --name <nome-da-sua-escolha> <imagem>:<tag>
+```
+
+### **Modo 'Cleanup'** : O parâmetro `--rm` deve garantir que o `container` seja removido ao final da execução (útil para testar imagens sem ficar acumulando `containers` novos) :
+```
+docker container run --rm <imagem>:<tag>
+```
+
+
 
 
 
