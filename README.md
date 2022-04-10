@@ -330,4 +330,49 @@ docker container ls -l
 ### Rodando um comando adicional antes de terminar o container
 No Docker é possível executar comandos de terminal no `container` antes que ele seja encerrado (sobretudo se quisermos manter ele ativo por mais tempo que o normal) .
 Para executar comandos no terminal do `container` é só adiciona-los no final da execução do `run` , conforme o modelo:
+```
+docker container run <nome-da-imagem>:<tag> <comando> <argumentos-do-comando>
+```
+exemplo: Vamos aqui imprimir na tela um " Uma frase qualquer" no terminal do Ubuntu, usando o comando `echo` do `shell` :
+
+```
+docker container run ubuntu echo 'tem que ser aspas simples'
+```
+## Rodando o container de forma interativa
+E se quisermos, por exemplo, utilizar um terminal dentro do `container` (á la inception) ? È só passar o parametro `-ti` * ao comando `run` que da acesso a esse terminal:
+
+* O comando `-ti` são dois comandos juntos:
+1. -t que indica pro docker que estamos requisitando um terminal no container que consiga imprimir o retorno dos nossos comandos;
+2. -i que estabelece uma interface de comunicação física com esse terminal, no caso, por meio do teclado.
+
+```
+docker container run -ti ubuntu
+```
+Dessa forma é possível ter acesso a ao terminal de forma interativa dentro do container , esse terminal já vem por padrão em modo `root` ( # ):
+
+com este comando podemos verificar relese do ubunto:
+```
+cat /etc/lsb-release
+```
+
+Aqui podemos notar que:
+* O domínio do usuario `root` no terminal do `container` é o `container id` do mesmo, nesse caso "xxxxxxx"(ZZZZZZZZZ);
+* O comando `cat /etc/lsb-release` retorna os dados da distribuição, no caso , o Ubunto;
+* Para sair ddesse terminal interno do `ontainer` e retornar ao seu terminal, é so utilizar o comando `exit`.
+
+Até  aqui, você aprendeu os princinpios basicos sobre o funcionamento de `container`. A seguir, vamos listar os principais comandos para manipulação  deles!
+
+
+## Principais comandos do CLI
+
+Passemos um resumo do que foi visto, complemtando com os **comandos adicionais que podem ser utilizados para manipulação de containers** no CLI do Docker.
+
+## Pontos importantes:
+
+* `docker <comando> <subcomando> <parâmetros> ` é o farmato padão para comandos não-abreviados no CLI;
+* Utilize o parametro `--help` no `<comando> ` ou ` <subcomando> ` para ter relação completa do que pode ser executado a parti deles;
+
+
+
+
 
