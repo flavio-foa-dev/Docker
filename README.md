@@ -414,6 +414,36 @@ Isso não significa, contudo, que os comandos das primeiras versões estejam dep
 ```
 docker container create <parâmetros> <imagem>:<tag>
 ```
+### O parâmetro `-it` nesse contexto, deve garantir que ao iniciar o `container` , ele se mantenha ativo e disponha de um terminal de acesso:
+```
+docker container create -it <imagem>:<tag>
+```
+
+### (Comando antigo) Abreviação do comando `docker container create` :
+```
+docker create <parâmetros> <imagem>:<tag>
+```
+## Listar containers
+### lista (`ls`, list em ingles)todos os **containers ativos**
+```
+docker container ls
+```
+### Lista todos os containers ativos e inativos :
+```
+docker container ls -a
+```
+### Lista o último container criado (independente do seu estado) :
+```
+docker container ls -l
+```
+### (Comando antigo) Abreviação do comando `docker container ls` (que também pode ser chamado como `docker container ps` ):
+```
+docker ps <parâmetro>
+```
+## Iniciar, reiniciar, pausar, resumir e parar um container
+
+
+
 
 
 
