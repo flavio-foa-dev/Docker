@@ -1,13 +1,13 @@
 const data =
 [
   {
-    name:"renata",
-    profissão: "professora",
+    name:"Renata",
+    profissão: "Professora",
     idade: 45,
   },
   {
-    name: "erick",
-    profissão:"operador salão",
+    name: "Erick",
+    profissão:"Operador Loja",
     idade: 20,
   }
 ]

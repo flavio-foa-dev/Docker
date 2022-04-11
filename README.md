@@ -440,7 +440,55 @@ docker container ls -l
 ```
 docker ps <parâmetro>
 ```
-## Iniciar, reiniciar, pausar, resumir e parar um container
+## Iniciar, reiniciar, pausar, resumir e parar um container;
+
+Iniciar* um `container` usando referencias de sua identificação unica (campo `CONTAINER ID`, parcialmente ou inteiro),ou pelo nome (campo `NAMES`) que foi definado:
+```
+docker container start <CONTAINER ID || NAMES>
+```
+  * Note que o comando start difere do comando run . O start apenas inicia o container que já havia sido criado (mas estava inativo), enquanto o run cria e executa um novo container!
+
+### Reinicia um `container` usando as referencias citadas anteriormente:
+```
+docker container restart <CONTAINER ID || NAMES>
+```
+### Pausar um `container` usando as referencias citadas anteriormente
+```
+docker container pause <CONTAINER ID || NAMES>
+```
+### Tira um `container` do modo de pausa usando as referências citadas anteriormente:
+```
+docker container unpause <CONTAINER ID || NAMES>
+```
+### Encerra um `container` usando as referências citadas anteriormente:
+```
+docker container stop <CONTAINER ID || NAMES>
+```
+### (Comando antigo) São abreviações para os comandos anteriores:
+```
+docker <start || restart || pause || unpause || stop> <CONTAINER ID || NAMES>
+```
+  Dica: É possível realizar essas operações passando mais de uma referência de container por vez, como no exemplo abaixo:
+```
+docker start 6a01 22b4
+docker stop 6a01 22b4
+```
+## Retomando o acesso a um `container` interativo rodando em segundo plano
+
+Caso voĉe tenha iniciado um `container` em segundo plano utilizando `-dit`, voce pode acessar esse `container` rodando o comando `attach`:
+```
+docker container attach <CONTAINER ID || NAMES>
+```
+### Abreviação do comando `docker container attach <CONTAINER ID || NAMES>`
+```
+docker attach <CONTAINER ID || NAMES>
+```
+
+## Excluindo `containers` especificos
+
+
+
+
 
 
 
