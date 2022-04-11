@@ -485,6 +485,31 @@ docker attach <CONTAINER ID || NAMES>
 ```
 
 ## Excluindo `containers` especificos
+### Se o `container` não estiver ativo, esse comando deve remover o mesmo:
+```
+docker container rm <CONTAINER ID || NAMES>
+```
+### Se o `container` estiver ativo, você deve passar o parâmetro `-f` (forçar) para parar sua execução e depois efetuar a remoção:
+```
+docker container rm -f <CONTAINER ID || NAMES>
+```
+### (Comando antigo) Abreviação do comando `docker container rm` :
+```
+docker rm <CONTAINER ID || NAMES>
+```
+## Limpando `containers` que nao estao sendo utilizados
+  ⚠️ Use com moderação ⚠️: Esse comando deve remover todos os containers inativos do seu computador. O comando pede confirmação:
+```
+docker container prune
+```
+## Monitorando os procesos dentro de um container
+  O comando `top` , assim como nos terminais linux, traz as informações sobre os processos que estão sendo rodados, **mas dentro daquele** `container` , o que não inclui, por exemplo, serviços que são compartilhados com o sistema hospedeiro. Ele é útil para quando estamos os rodando em segundo plano:
+
+
+Aqui o `container` é rodado com um comando `dd if=/dev/zero of=/dev/null` (que no nosso caso, serve para estressar o `container` ) que gerou um processo, esse que é mostrado na lista de processos.
+
+
+
 
 
 
