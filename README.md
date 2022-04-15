@@ -527,6 +527,94 @@ Como falamos acima , é importante distinguir uma imagem (image) de um contêine
   * Frequentemente no contexto de programação, o termo build ('construir' em português) se refere ao trabalho de pegar aquele conjunto de instruções que definimos antes (o nosso "script", "código fonte"), e a partir dele, construir um produto que seja executável de maneira mais simples - que por tanto, é melhor para distribuir.
   ** Veremos mais adiante, mas o Dockerfile é um arquivo que contém as instruções necessárias (como um "script") para que rodemos uma aplicação: Sistema Operacional (SO) utilizado, bibliotecas que devem ser instaladas, arquivos que devem ser inicializados, etc.
 
+**um container, e como se fosse um contexto (ativo ou inativo) de uma aplicação, esse contexto, é baseado em uma imagem,**
+exemplo:
+  Um container que é baseado em Linux e que tem o NodeJS instalado e configurado (imagem node ) , para que minha aplicação em React funcione corretamente;
+
+*lembre-se que, se rodarmos um container com `docker run <imagem>:<tag>. mas se não tivermos essa imagem*
+*(vamos supor aqui o hello-world ) localmente , ele nos retorna a seguinte mensagem?*
+```
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+```
+Essa mensagem, indica que o Docker baixou e armazenou a imagem localmente. A parti dai, sempre que o Docker precisar de uma referencia daquela imagem, ele usara uma cópia local dela para trabalhar.
+
+Hoje veremos onde encontrar essas imagens baixadas, como criar imagens Docker, além de como manipula-las e  removê-las.
+
+# o que são imagens docker
+Imagens docker são arquivos que funcionam como espécies de fotos de programas, bibliotecas, frameworks ou mesmo sistemas operacionais, a parti das quais construirmos containers e execultamos códigos dentro do Docker
+
+Voltando ao exemplo de quando rodamos uma imagem do Docker Hub pela primeira vez e ela é baixada automagicamente para o nosso computador, você pode confirmar a existência daquela imagem executando o seguinte comando:
+```
+docker images
+```
+Esse comando serve para listar todas as imagens que foram baixadas em algum momento no seu pc. Dessa forma podemos verificar que a imagem esta devidamente instalada localmente como pode ser visto abaixo pelo exemplo.
+```
+REPOSITORY     TAG       IMAGE ID       CREATED        SIZE
+hello-world    latest    bc11b176a293   6 weeks ago    9.14kB
+```
+Para saber se o cantainer para da imagem `hello-world` foi criado a parti da imagem, basta rodar o comando que ja conhecemos
+```
+docker ps -a
+```
+Como já vimos anteriormente, o comando acima deve nos retornar a lista de `containers` ativos e inativos (parâmetro `-a` ):
+exemplo:
+```
+CONTAINER ID   IMAGE         COMMAND      CREATED             STATUS                         PORTS         NAMES
+b3b610c87a9   hello-world   "/hello"     24 minutes ago      Exited (0) 24 minutes ago                    priceless_nightingale
+```
+O que é preciso entender nesse ponto é que **a parti de uma imagem, podemos ter varios** `containers` isso que dizer que se rodarmos novamente o seguinte comando:
+```
+docker run hello-world
+```
+Teremos mais um container local da imagem `hello-world`, como no exemplo a seguir:
+```
+CONTAINER ID   IMAGE        COMMAND     CREATED          STATUS                    PORTS      NAMES
+c7112ffa7991   hello-world  "/hello"    10 seconds ago   Exited (0) 9 seconds ago             optimistic_fermat
+b3b610c87a9   hello-world  "/hello"    44 minutes ago   Exited (0) 44 minutes ago            priceless_nightingale
+```
+Agora se executarmos o seguinte comando para listar as imagens:
+```
+docker images
+```
+Percebemos que a imagem hello-world continua unica:
+```
+REPOSITORY                     TAG       IMAGE ID       CREATED        SIZE
+hello-world                    latest    bc11b176a293   6 weeks ago    9.14kB
+```
+o que aprendemos aqui é que **podemos ter varias containers reproduzindo uma mesma imagem do Docker**
+Toda imagem possui sua `imagem ID` e todo container possiu seu `container ID` .Ambos são identificadores unicos desse elementos dentro do Docker e servem como referencia para outras possibilidades de comando.
+
+Por exemplo, anteriormente, vimos que o comando `docker container rm -f <CONTAINER ID>`apaga o container, mesmo que ele esteja ativo(parãmetro `-f`).
+
+Entretanto, se for necessario remover a imagem que gera os containers, primeiro é preciso obter o `IMAGE ID` por meio do seguinte comando:
+```
+docker images
+```
+Depois de obter o `image ID`, basta executar o comando `docker rmi -f <IMAGE ID>`, em que o `rmi` vem de 'R'e'M'over 'I'magem(remover imagem).
+```
+docker rmi -f <imagemid>
+docker rmi -f bc11b176a293
+```
+Da mesma forma, o comando `-f` serve para forçar a remoção do recurso.
+Sem a flag `-f` , o Docker irá nos alertar que já foram criados containers a partir da imagem que estamos tentando excluir, pois a remoção dessa imagem também removerá a fonte de referência dos containers criados a partir dela. Para excluir a imagem mesmo assim, é preciso acrescentar a flag `-f` .
+
+A partir do momento que excluímos uma imagem que era referência para um container, precisaremos baixar uma nova imagem se quisermos rodar os containers criados novamente*.
+
+  * É importante ressaltar que ao excluir uma imagem, os containers gerados a partir dela não serão excluídos, apenas ficaram órfãos das camadas da imagem que a utilizavam para executar suas funções.
+  Portanto, para gerar novos containers precisaremos de uma nova imagem.
+
+# Como funciona o sistema de camadas de uma imagem
+Quando fazemos o download de uma imagem (por exemplo, com o comando `docker pull <imagem>` , que baixa a imagem, mas não cria nenhum container) , podemos perceber nesse processo, a existência de vários downloads e extrações acontecendo. **Cada um desses downloads representa uma camada :**
+
+
+
+
+
+
+
+
+
 
 
 
