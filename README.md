@@ -606,6 +606,25 @@ A partir do momento que excluímos uma imagem que era referência para um contai
 
 # Como funciona o sistema de camadas de uma imagem
 Quando fazemos o download de uma imagem (por exemplo, com o comando `docker pull <imagem>` , que baixa a imagem, mas não cria nenhum container) , podemos perceber nesse processo, a existência de vários downloads e extrações acontecendo. **Cada um desses downloads representa uma camada :**
+Mas para que servem essas camadas, O docker divide suas imagens em camadas para que elas possam ser reaproveitada por outros imagens e não precisem ser instaladas em duplicidade.
+
+Toda imagem no docker pode ter  uma ou varias camadas e esse sistema e conhecido como `layered File System(sistema de arquivos em camadas).
+
+como em praticamente toda  instancia dentro do Docker, cada camada também é reposnsavel por um um codigo único(uma hash). A finalidade dessas camadas *é que elas possam ser reaproveitadas por outras imagens*
+**Cada camada corresponde a um conjunto de instruções que, em algum casos, são comuns a outras imagens.**
+
+Exemplo: a *distribuição linux alpine* é muito utilizada em imagens docker por ser uma distribuição que possui somente o essencial para o seu funcionamento, o que torna ela uma opção leve, rápida, simples e segura.
+Por isso, vários softwares a usam por padrão, ou pelo menos mantêm uma versão / tag utilizando essa distribuição como base, como é o caso do `node:alpine` .
+
+Portanto, se dermos o comando `docker pull alpine:3.13` * baixando a versão `3.13` dessa distribuição e, logo após, dermos o comando `docker pull node:alpine3.13` (ou seja, baixando uma imagem do software `node` preparada a partir da mesma versão dessa distribuição) , veremos que a imagem do node, **deve reaproveitar uma camada que já foi baixada em outro momento** :
+ * Lembrando aqui o formato `docker pull <imagem>:<tag>` , no qual a `<tag>` é opcional.
+
+
+
+
+
+
+
 
 
 
