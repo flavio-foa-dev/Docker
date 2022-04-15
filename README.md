@@ -619,6 +619,58 @@ Por isso, vários softwares a usam por padrão, ou pelo menos mantêm uma versã
 Portanto, se dermos o comando `docker pull alpine:3.13` * baixando a versão `3.13` dessa distribuição e, logo após, dermos o comando `docker pull node:alpine3.13` (ou seja, baixando uma imagem do software `node` preparada a partir da mesma versão dessa distribuição) , veremos que a imagem do node, **deve reaproveitar uma camada que já foi baixada em outro momento** :
  * Lembrando aqui o formato `docker pull <imagem>:<tag>` , no qual a `<tag>` é opcional.
 
+Aqui, hã o reaproveitamento das camadas da distro `Alpine` pela imagem do `node` e, sucessivamente pelas **imagens que sejam derivadas desre** Qualquer outras imagens que tenham etapas iguais a alguma das anteriores tambem vão aproveitar aquelas que ja estâo salvas no disco.
+Dessa forma. o Docker consegue enconomizar espaço em disco nao precisando baixar camadas em duplicidade
+Um ponto importante sobre as camadas é que aquelas que pertecem a imagem **são somente para leitura**, ou seja , você não consegue escrever nada nelas.
+
+Porém, como vimos la acima, se acerssarmos um `container` de modo interativo(por exemplo, com `docker run it ubunto`). e fizermos atualização(com o `apt-get`)ou criarmos novos arquivos, estes serão persistentes mesmo se reiniciarmos o container.
+
+  Faça esse experimento, rode no terminal o comando:
+```
+docker run --name meu_container -it ubuntu
+```
+  No terminal do container criado, rode o seguinte comando para criar um arquivo de texto, já com um conteúdo dentro:
+```
+echo "Teste container" > ola_mundo.txt
+```
+  Verifique se o arquivo foi criado, consultando seu conteúdo com o comando cat :
+```
+cat ola_mundo.txt
+```
+  Assim que o terminal imprimir a mensagem Teste container , encerre o terminal com o comando exit ;
+  Esse comando deve inativar o container, que estava ativo por conta dessa interação;
+  Até aqui, entendemos que houve escrita na área reservada para isso no container , portanto, se iniciarmos o container novamente:
+docker start -ai meu_container
+```
+# Aqui passamos o parâmetro `-ai` ao comando `start`,
+# para dizer que queremos acoplar ao container (`a`, de 'attach'),
+# de modo interativo (`i`, de 'interactive').
+```
+  E rodarmos novamente o comando cat no terminal interativo para imprimir o conteúdo do nosso arquivo:
+```
+cat ola_mundo.txt
+nl ola_mundo.txt
+```
+  Você verá que a mensagem Teste container apareceu novamente, logo, o arquivo ola_mundo.txt persistiu mesmo ao reiniciarmos o container.
+
+Como isso foi possível? Como citado anteriormente, não é possível escrever nas camadas de uma imagem, mas todas as vezes que criamos um container, uma camada extra (chamada frequentemente de “container layer” - camada do container) é adicionada aquela imagem para que seja possível ler e escrever nela:
+
+Desse modo, ao criar um `container` sobre uma imagem, é possível interagir (por meio de leitura e escrita) com essa camada extra do `container` e o restante das camadas permanece inalterada, apenas com permissão de leitura.
+
+É dessa forma que conseguimos ter vários `containers` trabalhando em cima de uma mesma imagem , dado que cada "camada de container" possui seu próprio espaço para leitura/escrita, conforme o diagrama:
+
+# Mapeamento de portas
+Agora que ja entendemos um pouco mais sobre containers, imagens e suas respectivas diferenças, faremos o uso de containers e imagens de uma forma um pouco mais complexa.
+Vamos criar um container para manter um **servidor HTTP apache**, para entedermos também como funciona a parte de reder em Docker.
+
+  * Veremos melhor futuramente, mas um `Servidor HTTP` (Ou servidor web) é um aplicativo capaz de disponibilizar arquivos (como páginas de internet) através de requisições via protocolo de comunicação `HTTP` , que é o mais utilizado na navegação via internet.
+  Existem vários servidores http no mercado. No nosso exemplo, utilizaremos o `Servidor HTTP Apache` , bastante popular entre pessoas desenvolvedoras da `linguagem PHP` .
+
+### criando a imagem
+```
+docker run -d -P httpd:2.4
+```
+
 
 
 
