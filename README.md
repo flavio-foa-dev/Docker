@@ -509,6 +509,23 @@ docker container prune
 Aqui o `container` é rodado com um comando `dd if=/dev/zero of=/dev/null` (que no nosso caso, serve para estressar o `container` ) que gerou um processo, esse que é mostrado na lista de processos.
 
 
+# Manipulação e criação de Imagens no Docker
+### proximos passos
+- no conteudo acima  vimos o conceito de empacotamento de aplicações, qual o tipo de problemas que o **Docker** se propõe a resolver, aspectos da arquitetura do Docker, os principais comandos para utilização do Docker e como rodar imagens do Docker Hub(Repositorio oficial de imagens do Docker).
+
+## Vamoas estudar
+- criar imagens com o Docker
+- Entender a arquitetura de camadas(layers) das imagens Docker:
+- Aplicar boas praticas e padões na criação de imagen;
+- "Dockerizar"/Gerar contêineres para suas aplicações;
+
+### Isso é importante para
+Como falamos acima , é importante distinguir uma imagem (image) de um contêiner (container)
+**São coisas diferentes, porém complementares.**
+
+**Uma imagem** *é um arquivo imutável e a partir dele um ou mais containers podem ser gerados. Uma imagem do Docker é criada a partir do processo de* `build` * de um arquivo chamado `Dockerfile` **.
+  * Frequentemente no contexto de programação, o termo build ('construir' em português) se refere ao trabalho de pegar aquele conjunto de instruções que definimos antes (o nosso "script", "código fonte"), e a partir dele, construir um produto que seja executável de maneira mais simples - que por tanto, é melhor para distribuir.
+  ** Veremos mais adiante, mas o Dockerfile é um arquivo que contém as instruções necessárias (como um "script") para que rodemos uma aplicação: Sistema Operacional (SO) utilizado, bibliotecas que devem ser instaladas, arquivos que devem ser inicializados, etc.
 
 
 
