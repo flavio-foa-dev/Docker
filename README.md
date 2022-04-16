@@ -722,6 +722,44 @@ A atribuição aleatória das portas é feita pela flag -P e, para especificar a
 ```
 docker run -d -p 54321:80 httpd:2.4
 ```
+  Nesse exemplo, mapeamos a porta 54321 do nosso computador à porta `80` do container. Agora podemos acessar o site estático mantido pelo servidor Apache acessando o endereço `http://localhost:54321` no navegador.
+
+  Um detalhe importante é que a porta do container vai variar dependendo da aplicação que você está rodando . No caso do servidor http , a porta padrão de acesso para páginas web é a `80` .
+  Em uma aplicação de React por outro lado, a imagem deveria expor a porta `3000` como padrão, então é importante saber qual porta sua aplicação vai usar antes de rodar o parâmetro `-p` .
+
+# Dockerfile - Comandos básicos
+Aprendemos até aqui, que para criarmos containers precisamos de uma imagem, que é uma base para a criação da nossa aplicação!
+
+Então, para criarmos containers para nossas aplicações, precisamos iniciar criando a imagem deles! E temos a alternativa de fazê-los a partir dos arquivos `Dockerfile` *.
+
+  * Não será abordado aqui, mas também podemos "commitar" (como no git ) alterações que fazemos em nossos containers, salvando eles em novas imagens.
+  Para isso podemos usar o comando docker commit , que serve literalmente para pegarmos as alterações (que são etapas adicionais) que fizemos no nosso container e salvar elas em uma imagem (nova ou já existente).
+
+  O Dockerfile nada mais é do que um arquivo de configuração usado pelo Docker com a descrição passo a passo do que você deseja que aconteça.
+  A seguir, aprenderemos como utilizar os principais comandos do `Dockerfile` , permitindo assim que tenhamos todos os recursos necessários para que nossos apps funcionem corretamente dentro de containers .
+
+  ⚠️ Atenção, essa seção do conteúdo possui exemplos com comandos de linguagens de programação que talvez você não conheça ainda. Não se preocupe! É importante ter em mente que são exemplos meramente didáticos, com a finalidade de explicar os comandos do `Dockerfile` .
+
+## Criando e rodando uma aplicação `React` com `Dockerfile`
+Para deixar as coisas mais interessantes, vamos dockerizar uma aplicação `React` . Não faremos incrementos na aplicação porque nosso intuito aqui é focar no processo de dockerização dela.
+
+Para dar contexto, vamos utilizar aqui um pequeno template em `NodeJS` , mas você não precisa se preocupar em compreender profundamente isso agora*.
+
+  * Veremos no futuro, mas o NodeJS é um software que possui a implementação do motor V8 do Google (O mesmo que usamos para codar javascript no navegador `Chrome` ) para utilização avançada em ambientes desktop.
+
+A primeira coisa que vamos  fazer é criar um React App, aqui chamaremos de `react-dockerized` acessando ele posteriormente:
+```
+npx create-react-app react-dockerized
+cd react-dockerized
+```
+Em seguida. crie um arquivo `Dockerfile` na raiz dessa pasta:
+```
+touch Dockerfile
+```
+
+
+
+
 
 
 
