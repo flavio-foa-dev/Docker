@@ -753,6 +753,15 @@ aqui nao abordaremos o React e sobre a linguagem Javascript, teremos o foco em `
 npx create-react-app react-dockerized
 cd react-dockerized
 ```
+  possiveis erros de atualizações do react  e nodeJs
+  npm install -g create-react-app
+  sudo npm install -g n
+  sudo n latest
+  sudo n stable
+Há um pacote chamado n, que nos ajuda a alterar a versão do Node
+Podemos instalá-lo com o npm de form global, com a flag -g
+Depois é possível alterar entre versão latest ou estável com simples comandos
+
 Em seguida. crie um arquivo `Dockerfile` na raiz dessa pasta:
 ```
 touch Dockerfile
@@ -762,40 +771,109 @@ Mas Hoje, vamos utilizar um pequeno exemplo externo, simulando um cenario que se
 
 Com isso em mente , agora vamos começar a editar nosso Dockerfile !
 
+### From
+Ao criarmos uma nova imagem, sempre devemos basea-la em uma putra, para isso utilizamos `FROM`. por exemplo, para criar uma nova imagem que roda sob um `ubuntu`
+```
+FROM ubuntu:latest
+```
+  A partir do `FROM` , é possível usar qualquer comando em qualquer ordem, porém, dependendo do funcionamento do seu aplicativo, etapas bem posicionadas podem otimizar o processo de `build` (que é a construção da imagem) , `rebuild` (reconstrução da imagem) ou mesmo na distribuição. Isso porque quanto menos etapas para aplicação rodar, menos camadas a imagem vai gerar, diminuindo seu peso.
+  Isso é importante, principalmente quando estamos trabalhando em uma imagem que recebe atualizações regulares.
+
+È recomendado utilizar sempre uma versão especifica de nossa imagem base em nossas imagem de produção, por exemplo: `ubunto:8` ao envés de `ubunto:latest`, isso garante que estaremos utilizando sempre a mesma imagem base quando buildarmos nossa imagem, evitando quebra de compatibilidade caso a imagem **latest** seja atualizada para a versão `9`, por exemplo
+
+Outra recomendação é, sempre que possivel, utilizar as versões minimas da imagem. por exemplo. imagens como a tag `slim` ou `alpine`, que são ,muito mais leves, pois utilizam versões minimas do SO (como é o caso do alpine) que possuem menos depedencias e ferramentas instaladas.
+
+Consequentemente, pode ser necessário a instalação de alguma ferramenta específica (que normalmente já viria instalada no SO) para que nossa aplicação funcione corretamente, porém, isso pode ser feito de maneira simples em nosso `Dockerfile` . Essa prática vale a pena pelos benefícios de se ter uma imagem muito mais leve, que pode ser 10 vezes menor.
+
+As especificações de imagens podem ser consultadas diretamente em [Docker Hub.](https://hub.docker.com/)
+
+  No Dockerfile do nosso mini-projeto, vamos basear nossa imagem no node:14-alpine (NodeJS versão 14 que roda a partir da distro Alpine) e dar o alias "build" para ela :
+
+```
+FROM node:14-alpine AS build
+```
+### WORKDIR
+Com o comando `WORKDIR` , podemos definir um "diretório de trabalho", que será utilizado como base para a execução dos comandos. Sua estrutura é a seguinte:
+
+```
+WORKDIR /diretorio/que/sera/utilizado
+```
+Na nossa aplicação, vamos definir o diretório /app como nosso `WORKDIR` no `Dockerfile` :
+
+```
+WORKDIR /app # Definimos o workdir
+```
+### COPY
+Vimos que conseguimos preparar nossa imagem para executar por exemplo, uma aplicação dentro do container, porém, precisamos do código fonte para rodá-lo.
+Para isso utilizamos o `COPY` (Copiar em português) , com ele conseguimos copiar diretórios e arquivos para dentro da nossa imagem:
+
+```
+COPY ["<ARQUIVO_1>","<ARQUIVO_2>",...,"<ARQUIVO_X>", "<PASTA-DESTINO>"]
+```
+Imagine que estamos em um diretório que possui uma pasta app com o código fonte de uma aplicação, para copiá-la para dentro da imagem e conseguirmos executá-la, basta aplicar:
+
+```
+COPY ["./app", "/usr/src/app"]
+```
+Com o comando `COPY` conseguimos montar nossa estrutura do código fonte dentro da imagem, porém, para executá-la precisaríamos apontar para o diretório que definimos anteriormente como nosso diretório de trabalho ( `WORKDIR` ).
+Vale ressaltar que no `COPY` tanto a sintaxe na forma exec ( `COPY ["arquivo1", "arquivo2", "./destino"]` ) como na shell ( `COPY arquivo1 arquivo2 ./destino` ) são aceitas*.
+  * O modo `shell` é como se você rodasse o comando em um terminal.
+
+  No `Dockerfile` do nosso mini-projeto, vamos copiar todos os arquivos que começam com "package" ( `package.json` e `package-lock.json` ), para nosso diretório atual, a pasta `/app` , usando a forma exec :
+
+```
+# FROM node:14-alpine AS build
+# WORKDIR /app
+COPY package*.json ./
+```
+### RUN
+
+
+```
+
+```
+
+
+```
+
+```
+
+
+```
+
+```
+
+
+```
+
+```
+
+
+```
+
+```
 
 
 
+```
+
+```
+
+
+```
+
+```
 
 
 
+```
+
+```
 
 
 
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```
 
 

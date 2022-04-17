@@ -11,12 +11,10 @@ const data =
     idade: 20,
   }
 ]
-
-
-
-
-
 console.table(data)
+
+
+
 
 const codigo = (id) =>{
 
@@ -27,6 +25,5 @@ const  ids = {
   }
   return "Sua letra é ...  " + ids[id]
 }
-
 const c = codigo(1)
 console.log(c)
