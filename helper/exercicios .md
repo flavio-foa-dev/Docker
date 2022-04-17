@@ -1,4 +1,4 @@
-# Exercicios
+# Exercicios 1
 
 1. No Docker Hub(https://hub.docker.com/search?q=&type=image) , utilizando a caixa de busca ( `"Search for great content"` ) , busque pela imagem da Distribuição `Linux Debian` ;
 
@@ -30,7 +30,7 @@
 
 
 
-# Gabarito.
+# Gabarito 1.
 
 Exercício 1
 No Docker Hub , utilizando a caixa de busca ( "Search for great content" ) , busque pela imagem da Distribuição Linux Debian .
@@ -100,5 +100,100 @@ Exercício 14
 Encerre o container utilizando os botões [ ctrl ] + [ c ].
 Solução
 Após fechar o jogo, utilize o comando clear para limpar a tela. Você pode constatar que, rodando um docker container ls -a , o container do jogo não estará presente.
+
+# Exercicios 2
+
+Vamos juntar tudo o que aprendemos até aqui e exercitar mais ainda nosso aprendizado!
+
+Exercício :
+
+Vamos usar uma imagem disponível no DockerHub conhecida como "cowsay" (Uma vaca falante no terminal 🐮!) !
+A ideia é deixarmos a mensagem para o cowsay parametrizável, dessa forma, conseguiremos executar o comando:
+
+docker container run cowsay Muuuuuuhhh
+
+E ter a seguinte saída no terminal:
+
+____________
+< Muuuuuuhhh >
+------------
+         \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+               ||----w |
+               ||     ||
+
+Para isso:
+
+Crie um Dockerfile utilizando a imagem chuanwen/cowsay .
+
+Agora defina um ENTRYPOINT para a execução do comando.
+
+Lembre-se que com ele, diferente do CMD o comando não poderá ser sobrescrito com o docker run , porém, conseguiremos passar parâmetros ao binário, exploraremos esse recurso para poder passar a mensagem.
+
+Utilize o CMD para definir uma mensagem padrão.
+
+Gere uma build e execute um container baseado em sua imagem sem passar nenhum comando.
+
+Agora execute um novo container passando sua mensagem para testar, além da mensagem você pode utilizar a opção -l para listar outros personagens disponíveis e então executar algo como docker container run cowsay -f dragon-and-cow "VQM FOA" , para exibir um dragão junto com a vaquinha.
+
+# Gabarito 2.
+
+Exercício
+Vamos usar uma imagem disponível no DockerHub conhecida como "cowsay" (Uma vaca falante no terminal 🐮!) !
+A ideia é deixarmos a mensagem para o cowsay parametrizável, dessa forma, conseguiremos executar o comando:
+
+docker container run cowsay Muuuuuuhhh
+
+E ter a seguinte saída no terminal:
+
+____________
+< Muuuuuuhhh >
+------------
+         \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+               ||----w |
+               ||     ||
+
+
+Item 1
+Crie um Dockerfile utilizando a imagem chuanwen/cowsay .
+
+Solução
+   FROM chuanwen/cowsay:latest
+
+Item 2
+Agora defina um ENTRYPOINT para a execução do comando, lembre-se que com ele, diferente do CMD o comando não poderá ser sobrescrito com o docker run , porém, conseguiremos passar parâmetros ao binário, exploraremos esse recurso para poder passar a mensagem.
+
+Solução
+ENTRYPOINT [ "/usr/games/cowsay" ]
+
+Item 3
+Utilize o CMD para definir uma mensagem padrão.
+
+Solução
+CMD [ "#VQV FOA" ]
+
+Item 4
+Builde e execute um container baseado em sua imagem sem passar nenhum comando.
+
+Solução
+docker image build ./ -t cowsay
+
+Item 5
+Agora execute um novo container passando sua mensagem para testar, além da mensagem você pode utilizar a opção -l para listar outros personagens disponíveis e então executar algo como docker container run cowsay -f dragon-and-cow "#VQV FOA" , para exibir um dragão junto com a vaquinha.
+
+Solução
+docker container run cowsay -f moofasa "#VQV TRYBE"
+
+
+# Exercicios 3.
+
+# Gabarito 3.
+
+
+
+
 
 

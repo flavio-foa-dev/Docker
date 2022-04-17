@@ -974,3 +974,216 @@ Aqui temos mais um ponto de atenção, caso o container seja executado passando 
 # EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
+### ENTRYPOINT
+Vimos que podemos utilizar o `CMD` para iniciarmos um comando ao executarmos nossos containers , como por exemplo para iniciarmos um app .
+Porém, para esse fim recomendamos utilizar `ENTRYPOINT` (Ponto de entrada em português) , pois, diferentemente do CMD , o comando não será sobrescrito pelo passado no `run` ao executarmos o container .
+Por exemplo:
+```
+ENTRYPOINT ["/bin/echo", "Hello World"]
+```
+Um ponto de atenção é que ao definirmos um entrypoint , alteramos o comportamento do `CMD` , que ao ser utilizado irá rodar como base para o comando definido pelo entrypoint , apenas como "parâmetros adicionais" à ele, por exemplo:
+```
+ENTRYPOINT [ "/bin/echo" ]
+CMD [ "Hello World" ]
+```
+Nesse exemplo, será executado no iniciar do container `echo Hello World` .
+Para ilustrar melhor a diferença entre os dois comandos, vamos a um exemplo em que poderíamos explorar a diferença entre eles:
+```
+ENTRYPOINT ["/bin/echo", "Hello"]
+CMD ["World"]
+```
+
+Nesse caso, ao executarmos o container , seria executado `echo Hello World` , porém poderíamos passar um parâmetro para o comando `docker container run` , de modo a substituir o `CMD` :
+```
+docker container run nossa-hello-world-image John
+```
+Neste caso, teriamos a seguinte saida no console `hello world`. Pois o CMD seria substituido pelo comando passadono `container run`
+
+  No `Dockerfile` do nosso mini-projeto, vamos substituir a linha que estava com CMD, agora passando no nosso `ENTRYPOINT` :
+
+```
+# FROM node:14-alpine AS build
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm install
+# COPY . .
+# RUN npm run build
+
+# FROM nginx:1.16.0-alpine AS prod
+# COPY --from=build /app/build /usr/share/nginx/html
+# EXPOSE 80
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+```
+## Gerando uma imagem a partir do nosso dockerfile
+ate aqui entendemos que o `Dockerfile` funciona como um manual de instruções pra nossa aplicação rodar, e o nosso ficou dessa formato da
+```
+FROM node:14-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+FROM nginx:1.16.0-alpine AS prod
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+```
+Mas para que a gente consiga de fato consolidar essas instruções em uma imagem, precisamos rodar o comando `ocker image build -t name:tag> <origem_docker_file>`!
+```
+docker image build -t react-dockerized:v1 .
+```
+  Aqui temos o comando `docker` , acompanhado da instância `image` , e do subcomando `build` . Isso deve retornar o `log` do processo de `build` , algo como:
+```
+Sending build context to Docker daemon  870.4kB
+Step 1/10 : FROM node:14-alpine AS build
+ ---> fe39f43f1d22
+Step 2/10 : WORKDIR /app
+ ---> Running in e42203ccae10
+Removing intermediate container e42203ccae10
+ ---> 890531fc8024
+Step 3/10 : COPY package*.json ./
+ ---> 7c756629dd86
+Step 4/10 : RUN npm install
+ ---> Running in 379b2754f2f6
+
+# ... demais passos
+
+Removing intermediate container 1be22b2c3906
+ ---> 9392a56b85dc
+Successfully built 9392a56b85dc
+Successfully tagged react-dockerized:v1
+```
+Também utilizamos o parâmetro `-t` (de `tag` ) com o valor `react-dockerized:v1` (aqui já estamos puxando uma tag "v1" para nossa imagem) e o ponto . , que está dizendo que o `Dockerfile` se encontra na mesma pasta em que o comando está sendo executado.
+
+Após a execução da `build` , podemos listar nossas imagens e verificar a presença da que acabamos de criar, com:
+```
+docker images
+```
+Para ver nossa aplicação funcionando, podemos rodar nosso mini-projeto no terminal interativo, definindo qual porta do nosso localhost será atribuida para qual porta do container :
+```
+docker run -dit -p 8000:80 --name reactdockerized react-dockerized:v1
+```
+Abra seu navegador na **URL http://localhost:8000/** e veja a página padrão do React funcionando.
+ criamos nossa primeira imagem customizada e executamos um container a partir dessa imagem.
+
+  Veremos mais adiante, mas notem aqui que cada comando gera uma camada ( `Layer` ), isso é importante já que essas camadas podem posteriormente ser usadas por imagens derivadas.
+
+
+## Dockerfile comandos adicionais
+### LABEL
+Labels (Rótulos em português) são um mecanismo para atribuir "metadatas" (dados auxiliares) aos seus objetos Docker , como imagens e containers.
+Com o parâmetro `LABEL` , é possível fazer essas definições em nosso Dockerfile .
+A documentação oficial recomenda o uso de labels para organizar nossas imagens, registrar informações de licenças, anotar relacionamentos entre containers e outros componentes ou qualquer outras informações que façam sentido ao objetivo do container ou sua aplicação.
+As informações são registradas seguindo o parâmetro de "chave e valor", e caso uma chave esteja repetida, a última sobrescreverá as anteriores:
+```
+LABEL <KEY>=<VALUE>
+```
+é comum registrarmos o maintener da imagem, para um possivel contato posterior para tirar duvidas ou seguir contribuições
+```
+LABEL maintener="John Doe <john.doe@google.com.br>"
+```
+Esse valor pode ser resgatado posteriormente através do comando `docker inspect <CONTAINER ID || NAMES>` , onde o valor estará no atributo `Labels` :
+```
+"Labels": {
+   "maintener": "John Doe <john.doe@trybe.com.br>"
+}
+```
+
+### ENV
+Em ambientes de desenvolvimento de apps é muito importante o uso de Env ironment Variables (Variáveis de ambiente, em português)*, felizmente também podemos utilizá-las em nossos containers.
+* Variáveis de ambiente são valores que são definidos dentro do escopo do sistema operacional, ou seja, são valores que estão disponíveis para todas as aplicações que estão instaladas dentro daquele SO .
+No `Dockerfile` , podemos definir nossas variáveis durante a criação de nossa imagem utilizando o comando `ENV` :
+```
+ENV <ENV NAME> <ENV VALUE>
+```
+Podemos utilizá-la, por exemplo, para setar o ambiente onde vamos rodar o app .
+```
+ENV NODE_ENV production
+```
+
+Ao rodar nossos containers, também podemos passar variáveis, basta utilizar a tag `--env` ou `-e` :
+```
+docker container run \
+   --env myCat=fluffy \
+   --env myName=johnDoe \
+   <IMAGE NAME>
+```
+Essas sobrescreverão as definidas no `Dockerfile` caso possuam o mesmo nome.
+
+### USER
+Com o comando `USER` , podemos definir qual o usuário que irá iniciar nosso app no container .
+Caso não seja definido nenhum usuário, o Docker irá utilizar o usuário root como padrão, o que não é recomendado por motivos de segurança.
+Abaixo temos um exemplo da criação de um usuário com apenas as permissões necessárias em uma imagem `ubuntu` :
+```
+FROM ubuntu:8
+RUN mkdir /app
+RUN groupadd -r node-user && useradd -r -s /bin/false -g node-user node-user
+WORKDIR /app
+COPY . /app
+RUN chown -R node-user:node-user /app
+USER node-user
+CMD node index.js
+```
+
+Normalmente as imagens já possuem um usuário criado para a execução de nossos `apps` .
+Por exemplo nas imagens `node` , já possuem um usuário genérico chamado "node" com os privilégios necessários, e para usá-lo, basta adicionarmos o usuário ao diretório de nosso projeto e utilizarmos a tag `user` :
+```
+FROM node:10-alpine
+COPY . /app
+RUN chown -R node:node /app
+USER node
+CMD [“node”, “index.js”]
+```
+
+### Layer e Cache
+Como visto na seção `Gerando uma imagem a partir do nosso Dockerfile` , ao criarmos nossas imagens, cada comando é considerado uma "camada" (layer), podemos ver detalhadamente ao gerarmos uma build ( buildarmos ) de nossas imagens, por exemplo:
+
+Importante entendermos essa arquitetura para explorarmos uma de suas principais funções, o uso de cache *.
+  * Esse termo remete ao uso de uma "memória cache", que na prática é uma armazenamento rápido e temporário, que pode ser utilizado junto a algum recurso.
+  Nesse o contexto, o nosso cache , mantém armazenados, camadas de uma imagens após seu processo de `build` .
+
+Caso o Docker identifique que não houve mudança naquele `Step` (passo, em português) , ele irá utilizar o cache do último `build` . Observe o seguinte `Dockerfile` , como exemplo:
+```
+# Step 1
+FROM node:10-alpine
+# Step 2
+WORKDIR /usr/src/app
+# Step 3
+COPY [".", "./"]
+# Step 4
+RUN ["npm", "install"]
+# Step 5
+ENTRYPOINT [ "npm", "start" ]
+```
+
+Uma vez que é realizado o build dessa imagem, ela não repetirá nenhum desses passos, a menos que haja alguma alteração.
+
+Imagine que alteramos qualquer coisa em nosso código fonte, então a partir do `Step 3` que utiliza diretamente o arquivo modificado, todos os passos serão reexecutados.
+
+Agora imagina que alteração foi em alguma parte do código e não teve nenhuma relação com as dependências, mesmo assim será executado o comando `npm install` novamente, mesmo que não tenhamos atualizado, adicionado ou removido nenhuma dependência.
+
+Para tirarmos melhor proveito dessa estrutura, é recomendado dividirmos em partes cada etapa do processo e sempre deixando as etapas mais propensas a alterações para baixo do nosso "pipeline" (Nossa segmentação de instruções) .
+
+Vamos à uma nova versão do nosso `Dockerfile` de exemplo:
+```
+# Step 1
+FROM node:10-alpine
+# Step 2
+WORKDIR /usr/src/app
+# Step 3
+COPY ["./package.json", "./package-lock.json", "./"]
+# Step 4
+RUN ["npm", "install"]
+# Step 5
+COPY ["./src", "./"]
+# Step 6
+ENTRYPOINT [ "npm", "start" ]
+```
+Nessa nova versão temos mais "steps", porém, caso haja alteração somente em nosso código fonte (contido em `src` ), apenas os passos a partir do "Step 5" serão repetidos, evitando a reinstalação das dependências, por exemplo. Esse é um exemplo simples mas já podemos perceber grande ganho em nosso `Dockerfile` , em arquivos mais complexos esse ganho é ainda maior.
+
+
+
+
+
+
