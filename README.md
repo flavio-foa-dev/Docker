@@ -748,6 +748,7 @@ Para dar contexto, vamos utilizar aqui um pequeno template em `NodeJS` , mas voc
   * Veremos no futuro, mas o NodeJS é um software que possui a implementação do motor V8 do Google (O mesmo que usamos para codar javascript no navegador `Chrome` ) para utilização avançada em ambientes desktop.
 
 A primeira coisa que vamos  fazer é criar um React App, aqui chamaremos de `react-dockerized` acessando ele posteriormente:
+aqui nao abordaremos o React e sobre a linguagem Javascript, teremos o foco em `Docker`
 ```
 npx create-react-app react-dockerized
 cd react-dockerized
@@ -756,7 +757,10 @@ Em seguida. crie um arquivo `Dockerfile` na raiz dessa pasta:
 ```
 touch Dockerfile
 ```
+A ideia do `Dockerfile` é que ele é autossuficiente, ou seja, é possivel criar e executar uma aplicação toda só por comandos dentro dele.
+Mas Hoje, vamos utilizar um pequeno exemplo externo, simulando um cenario que sera bastante comum para você, que é o cenario de desenvolvimento local(em que você tera arquivos de projeto dentgro de uma pasta no seu computador, onde estara tambem seu `dockerfile`)
 
+Com isso em mente , agora vamos começar a editar nosso Dockerfile !
 
 
 
