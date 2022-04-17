@@ -948,3 +948,29 @@ Após rodar o `container` , basta acessar `localhost:3000` para visualizar nosso
 Ao listar os containers em execução com `docker container ps` , podemos ver as portas expostas e seus respectivos binds , através do campo `PORTS` .
 
 ### CMD
+O comando `CMD` (Que vem de C o m man d Prompt, ou Prompt de comando em português) , sempre é executado quando o container é iniciado .
+É interessante ressaltar que pode acontecer de mais de um `CMD` ser definido em um mesmo `Dockerfile` e, neste caso, apenas o último terá efeito.
+O `CMD` possui 2 formas: a que vimos até aqui para a execução de comandos `shell` e as para executáveis. Vamos ver um exemplo:
+```
+CMD ["/bin/echo", "Hello World"]
+```
+Nesse forma, o primeiro argumento é o executável e os demais são seus parâmetros.
+Normalmente utilizamos o `CMD` para executar o comando que irá rodar com o container, poderíamos usar como exemplo o start de um app , por exemplo:
+```
+CMD npm start
+```
+Aqui temos mais um ponto de atenção, caso o container seja executado passando um comando no `run`, o comando passado sobrescrevera o comando definido na porta `CMD`
+  Podemos utilizar o `CMD` no `Dockerfile` do nosso projeto, da seguinte forma:
+```
+# FROM node:14-alpine AS build
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm install
+# COPY . .
+# RUN npm run build
+
+# FROM nginx:1.16.0-alpine AS prod
+# COPY --from=build /app/build /usr/share/nginx/html
+# EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
