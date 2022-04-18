@@ -1184,6 +1184,78 @@ Nessa nova versão temos mais "steps", porém, caso haja alteração somente em 
 
 
 
+# Oruqestrando Container com DOcker Compose
+### Vamos aprender
+Dando continuidade sobre docker, estudaremos como gerenciar todos ambientes de containner utilizando a ferramenta Docker Compose. Além disso , aprederemos como e por que utilizar volumes e conheceremos o recurso de networks no docker.
+
+## Vamos aprender
+- Gerenciar redes Docker, utilizando-as para a comunicação e isolamento de containers:
+- Persistir dados dos containers utilizando volumes
+- Criar arquivos COMPOSE para gerenciar todo seu ambiente com Docker;
+- Gerenciar Services, NetWork e volumes a parti do compose
+
+Ja vimos anteriormente o que são imagens, contaners e comousar o `dockerfile` para passar todas as instruções para montar nosso sistema convidado
+
+Hoje, aprenderemos sobre o Docker Compose, ARQUIVO PELO QUAL CONSEGUIMOS CONFIGURAR TODO UM AMBIENTE DE CONTAINERS de maneira muito mais simples;
+
+Em um ecosistema de aplicação com  varias linguagens de programação e tecnologias distintas rodando em seus respectivos containers, o Docker Compose entra como uma solução que consegue organizar o funcionamento e a configuração de todas essas partes que compõeem um sistema.
+
+Usando o Docker Compose, definimos em um arquivo de configuração `yaml` todos os detalhes para executar nosso ambiente de desenvolvimento local, aproveitando todas as vantagens do `Docker`, sem se preucupar em subir ca ium dos containers que envolvem um app com seus parametros especificos no `run`
+
+Muitas vezes, ele é comparado a uma receita, pois indica tanto os componentes ques serão utilizados quanto em que ordem cada comando deve ser executado.
+
+Além disso, nossos ambientes geralmente possuem vários serviços que precisam se comunicar entre si, por exemplo, um back-end com um front-end ou um serviço com um banco de dados. Nesse contexto, saber como trabalhar com networks pode ser muito vantajoso por nos permitir lidar com essa comunicação entre containers mais facilmente.
+
+Outros recursos importantes que também precisamos entender são os Volumes . Eles são componentes do Docker responsáveis por prover a preservação de informações. Isso é muito útil, pois é comum precisarmos de soluções para que de dados ou arquivos, como banco de dados, persistam.
+
+Esses componentes mais o Compose irão nos permitir criar todo nosso ambiente de maneira simples, utilizando todos os recursos e vantagens do Docker . Isso garantirá que mesmo que nosso ambiente tenha diversos serviços como APIs, front-ends, banco de dados, entre outros, conseguiremos integrá-los, permitindo que tudo isso rode em qualquer ambiente com Docker e sua publicação seja feita de forma descomplicada e eficiente.
+
+# vamos la
+
+## Networks - Redes no Docker
+
+Anteriormente, vimos como "expor" as portas de nossos containers para acessá-los de fora, utilizando o parâmetro `EXPOSE` em nosso `Dockerfile` , e também como fazer a atribuição ( bind ) com as portas de nossa máquina host utilizando o parâmetro `-p` no `docker container run` . Chamamos de mapeamento de portas esses recursos que vinculam ou tornam visíveis portas do container para a nossa máquina localhost .
+
+Já o Docker network , é uma espécie de rede virtualizada que permite que você conecte containers a uma determinada rede ou quantas redes Docker desejar, de forma que esses containers possam compartilhar informações através dessa rede.
+Por padrão, o Docker possui 3 redes que são criadas junto com ele: `bridge` , `none` e `host` . Cada uma delas tem características específicas quanto a conectividade para seus containers . Podemos consultá-las executando:
+```
+docker network ls
+```
+Vamos entender o que é cada uma!
+```
+NETWORK ID     NAME      DRIVER    SCOPE
+4c90d7a72df2   bridge    bridge    local
+a8061ca73fa5   host      host      local
+ef6d0c7c65e5   none      null      local
+```
+### Bridge
+Ao ser iniciado, todo container é associado a uma rede e, caso uma rede não seja seja especificada explicitamente por nós, ele será associado a rede `Bridge` .
+Todos os containers associados a essa rede poderão se comunicar via protocolo `TCP/IP` e, se soubermos o IP do container que queremos conectar, podemos enviar tráfego a ele. Porém, os IPs de um container são gerados automaticamente, por isso não é muito útil fazermos a conexão dessa forma, pois sempre que o container for reiniciado, o IP poderá mudar.
+
+Uma maneira de fazermos a descoberta do IP automaticamente pelo nome, é utilizando a opção `--link` *.
+  * No entanto, na documentação do Docker desencoraja seu uso e alerta que essa flag ( `--link` ) pode ser removida eventualmente.
+
+Para fins didáticos, vamos ver como isso funciona, utilizando uma imagem `busybox` , mas mais adiante veremos a melhor alternativa para fazer isso.
+Digite no terminal:
+```
+docker container run -ti --name container1 busybox
+docker container run -ti --link container1 --name container2 busybox
+```
+Agora, o `container2` poderá se conectar no `container1` . Para fazermos um teste simples, podemos fazer um `ping` no `container1` , dentro do `container2` , apenas digitando no terminal interativo do `container2` :
+
+```
+ping container1
+```
+* É bom ressaltar que a opção --link não é necessária para permitir que os serviços se comuniquem, pois, por padrão, qualquer serviço pode alcançar qualquer outro serviço a partir de seu `IP` . Os links apenas permitem definir apelidos extras pelos quais um serviço pode ser acessado de outro serviço.
+⚠️ Dica: Perceba que nos exemplos utilizamos uma imagem chamada `busybox` , ela é uma suite que possui vários utilitários Unix, dessa forma é muito útil quando queremos explorar comandos como o ping para testes.
+
+## Host
+Ao associarmos um container a essa rede, ela passa a compartilhar toda stack de rede do host , ou seja, da máquina que roda o ambiente Docker . O uso desta rede é recomendada apenas para alguns serviços específicos, normalmente de infra, em que o container precisa desse compartilhamento. Caso contrário, a recomendação é evitá-la.
+
+## None
+Essa é uma rede que não possui nenhum driver associado. Dessa maneira, ao atribuir um container a ela, o mesmo ficará isolado. Ela é útil quando temos containers que utilizam arquivos para a execução de comandos ou para se comunicar, por exemplo, um container de backup ou que rode apenas um script localmente.
 
 
+# Criando Nossa Rede
+A forma mais recomendada de comunicarmos nossos containers é criando nossa própria rede. Através dela conseguimos, por exemplo, referenciar um container a partir de outro, utilizando seu nome
 
