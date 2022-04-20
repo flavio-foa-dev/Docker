@@ -1257,5 +1257,5 @@ Essa é uma rede que não possui nenhum driver associado. Dessa maneira, ao atri
 
 
 # Criando Nossa Rede
-A forma mais recomendada de comunicarmos nossos containers é criando nossa própria rede. Através dela conseguimos, por exemplo, referenciar um container a partir de outro, utilizando seu nome
+A forma mais recomendada de comunicarmos nossos containers é criando nossa própria rede. Através dela conseguimos, por exemplo, referenciar um container a partir de outro, utilizando seu
 
