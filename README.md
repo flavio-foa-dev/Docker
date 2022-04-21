@@ -1345,8 +1345,20 @@ Teremos uma saída com muitas informações, mas o mais importante nesse momento
       "Propagation": "rprivate"
    }
 ]
+
+docker container run -p 8080:80 -v /home/flavio/hello-word/nlw/:/usr/local/apache2/htdocs/ httpd:2.4
 ```
-E voilà! Nosso arquivo primeiro-teste.html permanece intacto.
+note que da mesma forma que fazemos o bind da porta , fazemos tambem o bind do arquivo para o apache
+E voilà! Nosso arquivo e compartilçhado com o serve apache .
+
+També é possivel especificar os volumes da nossa imagem no nosso `dockerfile`. Para isso. basta utilizarmos o comando `volume`
+e então, e então, caso não especifiquemos outros comportamentos para o container , será criado o ponto de montagem especificado.
+
+A sintaxe em nosso Dockerfile é bem simples, basta especificarmos qual diretório será utilizado como volume por nossa imagem:
+```
+VOLUME ["/data"]
+```
+
 
 
 
