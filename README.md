@@ -1262,5 +1262,91 @@ exemplo:
 ```
 docker network create --driver bridge rede-do-foa
 ```
+Para vincular nosso container a nossa rede criada durante sua execução, basta passar o paramnetro `--network`
+
+```
+docker container run \
+    -itd \
+    --network minha-do-foa \
+     --name meu-container \
+     busybox
+```
+Agora, note a rede `rede-do-foa` eo drive `bridge`
+```
+Docker network ls
+```
+Para conectarmos um container já criado, basta utilizarmos o parâmetro `connect`:
+
+```
+docker network connect rede-do-foa meu-container
+```
+E para desconecta-la, basta utilizar a o parâmetro `disconnect`
+```
+docker network disconnect rede-do-foa meu-container
+```
+
+Importante lembrarmos que drivers e networks são objetos diferentes. Uma rede é associada a um ou nenhum driver , as redes padrões que mencionamos acima, possuem o mesmo nome de seu driver, porém não confunda. Por exemplo, a rede bridge possui o driver bridge e, quando ao criarmos nossa própria rede, também utilizamos esse driver, porém não há relação com a rede padrão de nome bridge , no caso não estaremos utilizando ela.
+Da mesma forma acontece com a rede host , já a rede none não possui um driver e, por isso, ao associarmos um container a ela, ele fica isolado.
+
+# Volumes - mapeando pastas para utilização em containers
+
+O que sabemos até o momento é que se removermos um container , todos os dados que manipulamos sobre ele também serão removidos. Isso acontece porque estamos escrevendo na camada criada pelo container e que permite leitura e escrita.
+Mas existe uma a possibilidade de persistir os dados em um container , que é a utilização de volumes !
+Utilizar um volume significa mapear uma pasta do nosso Sistema Hospedeiro ( `Docker Host` ), para o Sistema Convidado (o container ).
+Assim, ela é vinculada ao container e mesmo que esse container seja removido, essa pasta permanecerá. Isso faz com que os dados não sejam perdidos.
+Utilizando um exemplo com o Apache , pense na seguinte situação: Queremos desenvolver nossa página `HTML` de forma que ela rode dentro do servidor `http Apache` , que não está instalado em nossa máquina.
+Assim, a medida que formos desenvolvendo nossa página `HTML` , precisamos que o nosso ambiente de desenvolvimento permaneça no container .
+Para isso, a primeira coisa que vamos fazer é criar a seguinte página `HTML` :
+
+```
+<!DOCTYPE html>
+   <html>
+      <head>
+      <title>Docker é muito bom!</title>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   </head>
+   <body>
+      <h1>Minha primeira página rodando em Docker.</h1>
+      <p>Estou começando minha primeira página em HTML.</p>
+   </body>
+</html>
+```
+  Salve o arquivo com o seguinte extensão html em alguma pasta local de fácil acesso*.
+
+Agora vamos criar um container , que manterá um volume vinculado a essa nossa pasta local, para que qualquer alteração que fizermos em nosso HTML seja refletida no servidor http em nosso container .
+
+```
+docker run -d --name meu-site -p 8881:80 -v "/home/flavio/hello-word/NLW Together - Discover
+/home.html/:/usr/local/apache2/htdocs/" httpd:2.4
+```
+Vamos entender este comando que acabamos de executar nos conectando usando a flag `-v`.
+
+Essa flag cria um volume e é seguida pelo endereço do diretório em nossa maquina `/usr/local/apache2/htdocs/ `a qual sera vinculado.
+   Esse diretório é específico para armazenar os arquivos que vão ser acessados no servidor `http Apache` e pode ser diferente, caso você opte por usar outro aplicativo.
+
+Salve seu arquivo e recarregue sua página no browser.
+O que podemos concluir com isso? Podemos criar um ambiente de desenvolvimento baseado apenas no uso de containers , o que facilita bastante o trabalho dos times de desenvolvimento, já que o volume pode ser compartilhado entre o time, e acessado via diferentes containers .
+Da mesma forma, tendo um volume na sua máquina, você pode utilizar outros containers sem perder seus arquivos!
+Com o uso do volume, mesmo que o container seja excluído, o volume será mantido. Isso quer dizer que tudo que colocarmos na pasta /usr/local/apache2/htdocs/ , do container , ficará preservado na pasta /home/trybe/meu-site em nossa máquina.
+Para verificarmos se essa afirmativa é verdadeira, faça o seguinte.
+
+```
+docker inspect meu-site #que é o nome que demos ao nosso container
+```
+
+Teremos uma saída com muitas informações, mas o mais importante nesse momento é o "Mounts" que nos mostra através da propriedade Source onde está o volume desse container em nosso Docker Host .
+```
+"Mounts": [
+   {
+      "Type": "bind",
+      "Source": "/home/trybe/meu-site",
+      "Destination": "/usr/local/apache2/htdocs",
+      "Mode": "",
+      "RW": true,
+      "Propagation": "rprivate"
+   }
+]
+```
+
 
 
