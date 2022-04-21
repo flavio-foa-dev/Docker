@@ -1316,8 +1316,7 @@ Para isso, a primeira coisa que vamos fazer é criar a seguinte página `HTML` :
 Agora vamos criar um container , que manterá um volume vinculado a essa nossa pasta local, para que qualquer alteração que fizermos em nosso HTML seja refletida no servidor http em nosso container .
 
 ```
-docker run -d --name meu-site -p 8881:80 -v "/home/flavio/hello-word/NLW Together - Discover
-/home.html/:/usr/local/apache2/htdocs/" httpd:2.4
+docker container run -p 8080:80 -v /home/flavio/hello-word/nlw/:/usr/local/apache2/htdocs/ httpd:2.4
 ```
 Vamos entender este comando que acabamos de executar nos conectando usando a flag `-v`.
 
@@ -1339,7 +1338,7 @@ Teremos uma saída com muitas informações, mas o mais importante nesse momento
 "Mounts": [
    {
       "Type": "bind",
-      "Source": "/home/trybe/meu-site",
+      "Source": "/home/documents/meu-site",
       "Destination": "/usr/local/apache2/htdocs",
       "Mode": "",
       "RW": true,
@@ -1347,6 +1346,8 @@ Teremos uma saída com muitas informações, mas o mais importante nesse momento
    }
 ]
 ```
+E voilà! Nosso arquivo primeiro-teste.html permanece intacto.
+
 
 
 
