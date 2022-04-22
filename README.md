@@ -1719,7 +1719,40 @@ services:
 networks:
   <NETWORK-1>:
 ```
+Agora, vamos a um exemplo! Imagine que temos um ambiente com 3` services` , sendo um front-end e dois back-ends, mais um banco de dados. Nessa arquitetura, apenas os back-ends acessam o banco de dados e o front-end acessa os back-ends. Para criarmos esses isolamentos, nosso `YAML` ficaria semelhante ao exemplo abaixo:
+```
+version: '3'
 
+services:
+  frontend-a:
+    build: ./frontend_a
+    networks:
+      - frontend
+
+  backend-a:
+    build: ./backend_a
+    networks:
+      - backend
+      - frontend
+
+  backend-b:
+    build: ./backend_b
+    networks:
+      - backend
+      - frontend
+
+  db:
+    image: mysql
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+```
+# Bônus: Tópicos extras sobre Docker
+
+Alguns tópicos podem agregar no seu entendimento sobre a utilização do Docker. Termos como `microsserviços` , `escalabilidade` e interação com o `Registry` são muito utilizados por quem trabalha frequentemente utilizando containerização .👩‍💻
 
 
 
