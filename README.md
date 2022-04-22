@@ -1453,6 +1453,195 @@ services:
   database:
     image: mjgargani/compose-example:database-trybe1.0
 ```
+Nosso arquivo irá funcionar como se estivéssemos executando três `docker container run` , um para cada serviço. Sendo assim, precisamos definir os demais parâmetros para os nossos containers .
+
+## Restart
+No Docker , existem as políticas de reinicialização, que servem para gerenciar se seus containers reiniciarão automaticamente quando o docker for reiniciado ou quando ocorrer algum erro, por exemplo.
+Este comando pode assumir quatro valores:
+
+- `no` - Este é o valor padrão assumido pelo Docker e define que o container não irá restartar automaticamente;
+- `on-failure` - Define que o container será reiniciado caso ocorra alguma falha, apontado pelo `exit code` diferente de zero;
+- `aways` - Especifica que sempre que o serviço parar, seja por um falha ou porque ele finalizou sua execução, ele irá ser reiniciado; *
+- `unless-stopped` - Define que o container sempre seja reiniciado, a menos que a menos que o Docker em si seja parado (manualmente ou não). No caso de ser interrompido, ele não reinicia nem depois que o daemon do Docker * seja reiniciado.
+
+  * Caso o container seja interrompido manualmente, ele só será reiniciado depois que o daemon do Docker for reiniciado ou que o próprio container seja reiniciado manualmente. Esse é um mecanismo pra evitar loops .
+  O daemon do Docker é um processo que contínuo e que roda em segundo plano, que gerencia os containers Docker em um host .
+
+É importante utilizarmos o parâmetro, principalmente quando utilizarmos o Docker Compose em ambiente de produção, conforme é recomendado pelas especificações da própria documentação.
+Com a adição dessa configuração, nosso exemplo ficará assim:
+```
+version: '3'
+services:
+  frontend:
+    image: mjgargani/compose-example:frontend-trybe1.0
+    restart: always
+  backend:
+    image: mjgargani/compose-example:backend-trybe1.0
+    restart: always
+  database:
+    image: mjgargani/compose-example:database-trybe1.0
+    restart: always
+```
+## Ports
+
+Uma configuração importante é a porta. Vimos nos conteúdos anteriores como expor e fazer bind delas em nossos containers . No `docker-compose.yaml` temos o parâmetro `ports` que se comporta da mesma maneira que o `-p` do `docker container run` .
+No nosso exemplo, queremos utilizar a porta `3000` para nosso front-end e a porta `3001` para nosso back-end, ambas fazendo bind para as respectivas portas no host . Dessa forma, nosso arquivo ficará assim:
+```
+version: '3'
+services:
+  frontend:
+    image: mjgargani/compose-example:frontend-trybe1.0
+    restart: always
+    ports:
+      - 3000:3000
+  backend:
+    image: mjgargani/compose-example:backend-trybe1.0
+    restart: always
+    ports:
+      - 3001:3001
+  database:
+    image: mjgargani/compose-example:database-trybe1.0
+    restart: always
+```
+Lembre-se sempre: o primeiro parametro é a porta do host e o segundo exposta no container.
+
+## Environment
+Outro parâmetro importante é o environment . Com ele, conseguimos configurar as variáveis de ambiente de nossos containers .
+Imagine que em nosso exemplo, precisamos passar para nosso back-end uma parte da `URL` onde o banco de dados irá rodar, em uma variável chamada `DB_HOST` . Nosso exemplo ficaria assim:
+```
+version: '3'
+services:
+  frontend:
+    image: mjgargani/compose-example:frontend-trybe1.0
+    restart: always
+    ports:
+      - 3000:3000
+  backend:
+    image: mjgargani/compose-example:backend-trybe1.0
+    restart: always
+    ports:
+      - 3001:3001
+    environment:
+      - DB_HOST=database
+  database:
+    image: mjgargani/compose-example:database-trybe1.0
+    restart: always
+```
+Perceba que estamos passando a variável "DB HOST" que está em nosso _host , para a variável "DB HOST" do _container , onde o back-end está esperando pela variável. Lembre-se que mesmo tendo a env configurada em seu ambiente, ela só será passada ao container se especificada aqui, da mesma maneira como fazemos com o parâmetro `-e` ou `--env` no comando `run` .
+
+Aqui também é possível utilizar variáveis de ambiente. Por exemplo, imagine que temos uma variável `API_SECRET` com uma secret . Por se tratar de um dado sensível, não podemos colocá-lo em um arquivo a ser versionado como parte de nossa aplicação, porém ainda temos que especificar ao Compose qual variável irá ser passada para qual container .
+
+  * No contexto de Docker, `secret` é um dado que não deve ser transmitido por uma rede ou armazenado sem criptografia em um Dockerfile ou no código fonte de sua aplicação, como uma senha ou uma chave privada SSH, por exemplo.
+
+Vamos ver como ficaria esse exemplo:
+Você pode dar uma olhada mais detalhada em variáveis de ambiente usando `docker-compose` [nesse link](https://docs.docker.com/compose/environment-variables/)
+
+## Depends On
+Outro parâmetro importante para garantir a ordem de inicialização e encerramento de `services` é o `depends_on` . Com ele, conseguimos estabelecer dependências entre os serviços.
+Para entendermos melhor os comportamentos dessa flag , vamos voltar para a aplicação que estamos construindo como exemplo:
+```
+version: "3.8"
+services:
+  frontend:
+    image: mjgargani/compose-example:frontend-trybe1.0
+    restart: always
+    ports:
+      - 3000:3000
+    depends_on:
+      - "backend"
+  backend:
+    image: mjgargani/compose-example:backend-trybe1.0
+    restart: always
+    ports:
+      - 3001:3001
+    environment:
+      - DB_HOST=database
+    depends_on:
+      - "database"
+  database:
+    image: mjgargani/compose-example:database-trybe1.0
+    restart: always
+```
+Nesse exemplo, os services serão iniciados respeitando a ordem das dependências, portanto, o `database` será iniciado antes do `backend` , que será startado antes do `frontend` .
+
+## Gerenciando Services
+Antes de seguirmos para os próximos comandos do Compose , vamos aprender alguns comandos de execução do arquivo `docker-compose.yaml` para ver na prática algumas implicações do que já aprendemos até aqui.
+
+## Up
+Ao rodar o comando `docker-compose up` , o Compose irá executar todos os containers especificados, baixando as imagens do repositório ou buildando localmente a partir do `Dockerfile` , de acordo com o que foi especificado no arquivo. Outro detalhe importante é que, nesse momento, além de executar os containers , o Compose irá criar os demais objetos especificados, como redes e volumes.
+
+Da mesma forma como rodamos os containers no modo `daemon` , podemos fazê-lo no `docker-compose up` utilizando o parâmetro `-d` .
+
+O parâmetro `-f` também pode ser utilizado, caso você tenha dado um nome diferente do padrão para o seu arquivo Compose . Se seu arquivo possuir o nome padrão `docker-compose.yaml` , não é necessário passar a essa flag , apenas lembre-se de estar no mesmo diretório que o arquivo.
+
+Caso você utilize a opção `-f` , lembre-se que ela pertence ao comando `docker-compose` , sendo assim, ela precisa ser passada logo após ele. Por exemplo: `docker-compose -f meu-arquivo-compose.yaml up` ou `docker-compose -f meu-arquivo-compose.yml stop` . A sintaxe `docker-compose <COMMAND> -f` não funcionará . perceba ordemdo `-f`
+
+Se você está construiu localmente um arquivo `docker-compose.yaml` como o do exemplo que desenvolvemos até aqui, tente entrar no diretório em que está o arquivo e executar os services utilizando o o comando:
+```
+docker-compose up
+```
+Podemos também usar este comando especificando um service .
+
+```
+docker-compose up <SERVICE NAME>
+```
+Se fizermos isso, o Compose irá incluir também suas dependências. Por exemplo, seguindo com nosso arquivo `docker-compose.yaml` de, se rodarmos o comando:
+
+```
+docker-compose backend
+```
+O Compose também irá criar e startar o `database` , que definimos no `docker-compose.yaml` como dependência do `service` backend , por meio do parâmetro `depends_on` .
+
+Caso você use o parâmetro `build` (que recebe o caminho do _Dockerfile da sua aplicação) ao invés de `image` , o _Compose irá buildar a imagem se isso não tiver sido feito anteriormente.
+
+Nesse sentido, outro parâmetro importante para conhecermos e muito usual é o `--build` . Perceba que, uma vez que a imagem seja buildada pelo Compose , na próxima vez que executarmos o `up` , ele utilizará essa imagem já criada, sem atualizá-la.
+
+Para forçamos um novo build , podemos utilizar a tag `--build` especificando um service ou não (dessa maneira ele irá tentar buildar todas as imagens possíveis novamente).
+```
+docker-compose up --build <SERVICE NAME>
+```
+
+É muito comum utilizarmos o `--build` durante o desenvolvimento, pois quando fazemos alguma alteração e queremos refleti-la em nosso ambiente Compose , precisamos rebuildar a imagem do service alterado para que as atualizações sejam aplicadas ao ambiente.
+
+⚠️ Lembre-se que para os comandos Compose , quando não especificado um arquivo com `-f` , a ferramenta irá buscar pelo arquivo docker-compose.yaml no diretório atual.
+
+## Down
+Se quisermos parar nossos `services` , podemos utilizar o comando `down` . Com ele, todos os containers irão ser parados e os objetos criados pelo `up` , como as redes, por exemplo, serão removidos.
+```
+docker-compose down
+```
+Não precisa se preocupar com remoção das redes e dos apontamentos que o comando causará, pois ao rodar o up novamente, tudo será recriado.
+
+## Ps
+Semelhantemente ao comando containers, podemos utilizar o parãmetro `ps` para listar os containers ativos. Porém, a grande diferença é que só serão listados os containers pertecentes ao arquivo compose referenciado(seja utilizando a flag `-f``ou utilizando o nome de arquivo padrão).
+```
+docker-compose ps
+```
+## Stop
+Com o comando `stop` , conseguimos parar os `services` e, consequentemente, todos os containers relacionados. Diferentemente do `down` , ele não irá remover as redes e outros objetos criados pelo `up` .
+```
+docker-compose stop
+```
+Lembre-se que podemos especificar um service a ser parado, para isso basta utilizarmos o nome que definimos no arquivo `Compose` .
+```
+docker-compose stop <SERVICE NAME>
+```
+
+De maneira semelhante ao que ocorre com o `docker-compose up` quando especificamos um `service` , ao especificarmos um `service` no o `docker-compose stop` , ele irá parar os serviços respeitando as dependências.
+
+Em nosso exemplo, o backend será parado antes do database , ao executarmos o comando:
+```
+docker-compose stop backend
+```
+
+## Start
+
+
+
+
+
+
+
 
 
 
