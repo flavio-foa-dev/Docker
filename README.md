@@ -1635,7 +1635,90 @@ docker-compose stop backend
 ```
 
 ## Start
+O start funciona de maneira análoga ao `stop` . Com ele, podemos startar os services parados referentes àquele arquivo Compose .
+```
+docker-compose start
+```
+Também de maneira semelhante ao stop , podemos especificar um service para ser startado utilizando o nome dele.
 
+## Logs
+Outro comando bem interessante é o `logs` . Com ele, podemos ver os logs de nossos services de maneira semelhante como fazemos unitariamente com os containers . Aqui podemos especificar um service para visualizar os logs de todos os seus containers , ou ver todos os logs daquele ambiente, conforme arquivo do Compose .
+
+De maneira similar também ao comando para containers , podemos utilizar a flag `-f` ou `--follow` para acompanhar em tempo real as saídas dos containers e o `--tail` , em que podemos definir o número de linhas para ser exibidos a partir do final dos logs .
+```
+docker-compose logs -f --tail=100 <SERVICE NAME>
+```
+# Compose File - Parte II
+## Volumes
+Assim como aprendemos a utilizar `volumes` executando nossos `containers` de maneira individual, conseguimos também utilizar `volumes` por meio do nosso arquivo compose .
+
+Podemos definir nossos volumes da mesma maneira que fazemos com o comando `docker container run` , tanto como bind como da forma nomeada.
+
+Podemos utilizar a forma mais extensa dele também, por exemplo:
+```
+version: "3.8"
+services:
+  web:
+    image: nginx:alpine
+    volumes:
+      - type: volume
+        source: mydata
+        target: /data
+        volume:
+          nocopy: true
+      - type: bind
+        source: ./static
+        target: /opt/app/static
+
+  db:
+    image: postgres:latest
+    volumes:
+      - "/var/run/postgres/postgres.sock:/var/run/postgres/postgres.sock"
+      - "dbdata:/var/lib/postgresql/data"
+
+volumes:
+  mydata:
+  dbdata:
+```
+## NetWorks
+Conforme vimos na seção Networks , nossos containers precisam estar na mesma rede para conseguir se comunicar utilizando o `name` .
+
+Utilizando o Docker Compose , isso já é realizado de maneira padrão. Ao iniciar um novo arquivo, será criada uma rede padrão (bridge) para comunicação de todos os serviços especificados nele, dessa forma conseguimos facilmente comunicar todos os `services` de nosso ambiente. Quando executamos nosso arquivo de exemplo, você pode ter notado que o início do log é justamente a criação de uma rede padrão, algo similar a imagem a seguir:
+```
+docker-compose up
+creating networks "docker-compose-ex_defauly" with the default driver ...
+```
+exemplo acima e somente para fins observação no `up`
+Criação de network padrão a partir do Compose
+
+
+
+⚠️ Lembre-se que se apontarmos para o `localhost:3000` simplesmente, nosso container irá acessar a sua própria porta `3000` e não irá encontrar nada, pois o banco está em outro serviço. Por isso, devemos sempre utilizar, caso o serviço esteja em outro container , o nome dele.
+
+Porém, ainda podemos criar nossas próprias redes customizadas, caso faça sentido para nossa arquitetura, por exemplo, quando queremos isolar os serviços.
+
+Para isso, basta utilizar a opção networks em nossos serviços, definindo uma rede para um serviço específico e, ao final do arquivo, de forma semelhante ao volume, definimos as redes a serem criadas. A sintaxe básica é a seguinte:
+```
+version: "<VERSÃO-DO-COMPOSE>"
+services:
+  <MEU-CONTAINER-1>:
+    image: <MINHA-IMAGEM:VERSÃO>
+    networks:
+      - <NETWORK-1>
+    # ... outras configurações
+  <MEU-CONTAINER-2>:
+    build: <CAMINHO-DO-DOCKERFILE>
+    networks:
+      - <NETWORK-1>
+      - <NETWORK-1>
+    # ... outras configurações
+  <MEU-CONTAINER-N>:
+    image: <MINHA-IMAGEM:VERSÃO>
+    # ... outras configurações
+
+networks:
+  <NETWORK-1>:
+```
 
 
 
