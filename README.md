@@ -1380,6 +1380,79 @@ Para isso, usamos um único arquivo `YAML` com todos os detalhes e especificaç�
 # Intalação do Docker Compose
 Para instalar o Docker Compose é bem simples, mas antes certifique-se que você já possui a `Docker Engine` ou o `Docker Desktop` instalado, conforme fizemos no inicio do aprendizado de Docker .
 
+Se você estiver utilizando `Windows` ou `Mac` , o Docker Compose já é instalado junto com o Docker Desktop . Caso esteja utilizando alguma distro `Linux` , basta utilizar o seguinte comando para realizar a instalação:
+```
+sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+Feito isso, basta aplicar a permissão de execução ao binário:
+```
+sudo chmod +x /usr/local/bin/docker-compose
+```
+E se tudo ocorrer bem, para validar a intalaçao basta executar o seguinte comando:
+```
+docker-compose --version
+```
+Devem ser exibidos os detalhes da versão instalada em seu terminal, para mais detalhes ou caso ocorra algum erro, consulte o [guia oficial](https://docs.docker.com/compose/install/#install-compose) .
+
+## Compose file - Parte I
+resumidamente , o arquivo Docker Compose é onde conseguimos  especificar todos os parametros que antes rodavamos unitariamente utilizando `docker container run`, além de podermos tmbem criar os demais objetos utilizados por eles, como redes e volumes.
+
+Mapear todos os comandos e estrutura-los em um unico arquivo tem diversas vantagens, uma delas especialmente vantajosa, quando estamos trabalhando com muitos container, é evitar ter que sempre digitar inúmeros pãrametros em linha de comando com o `run` . Além disso, utilizar o Docker Compose torna mais fácil editar configurações e automatiza a execução de comandos.
+
+Toda a configuração do Docker Compose é feita por meio de um arquivo YAML . O nome padrão que utilizamos é `docker-compose.yaml` , porém, pode ser utilizado qualquer outro nome de nossa escolha.
+
+```
+version: "<VERSÃO-DO-COMPOSE>"
+services: # Definição dos containers
+  <MEU-CONTAINER-1>:
+    image: <MINHA-IMAGEM:VERSÃO> # Exemplo carregando uma imagem já _buildada_
+    # ... outras configurações
+  <MEU-CONTAINER-2>:
+    build: <CAMINHO-DO-DOCKERFILE> # Exemplo gerando uma build a partir de um `Dockerfile`
+    # ... outras configurações
+  <MEU-CONTAINER-N>:
+    image: <MINHA-IMAGEM:VERSÃO>
+    # ... outras configurações
+```
+Vamos ver agora, detalhadamente, como utilizar os principais parâmetros e rodar nossas aplicações utilizando o Compose .
+
+## Version
+
+odo arquivo `docker-compose.yaml` deve iniciar com a `tag version` , dessa maneira definimos qual a versão que deverá ser utilizada pelo compose para interpretar o arquivo, evitando assim que o docker-compose.yaml fique incompatível com versões mais recentes do compose .
+Você pode consultar as especificações de cada versão [aqui](https://docs.docker.com/compose/compose-file/compose-versioning/#versioning) .
+
+Utilizaremos a versão `3` do compose , sendo assim, nosso yaml iniciará da seguinte maneira:
+```
+version: '3'
+```
+## Services
+
+Para o Compose , há o conceito de `services` , que são os "tipos" dos containers que iremos rodar. Por exemplo, se vamos executar uma API , dizemos que ela é um service . Isso porque com o Compose , podemos escalar nossos apps em vários containers .
+Podemos, por exemplo, escalar nossa API em 4 containers diferentes, de forma que teremos um service que é a nossa API , porém com 4 containers em execução.
+Dessa forma, ao escrevermos nosso arquivo, temos que pensar em services , pois é assim que iremos defini-los. Vamos a um exemplo! Imagine que queremos subir uma aplicação que contém um front-end, um back-end e um banco de dados. Dessa forma, não precisamos ainda pensar em quantos containers teremos, porém, podemos dizer que temos 3 services . Para definir nossos services , utilizamos o parâmetro `services` . Vamos ver como ficaria esse exemplo em nosso arquivo Compose :
+```
+version: '3'
+services:
+  frontend::
+
+  backend:
+
+  database:
+```
+Perceba que aqui apenas demos um nome aos nossos serviços, porém não especificamos o que deverá ser executado ainda. Lembre-se que todo container é criado a parti de uma iamagem, sendo assim, precisamos especifica-las aos nossos serviços. Para isso podemos utilizar dois comandos: `imagem` para especificar uma imagem, seja local ou a ser baixada no Docker Hub, ou `build`, para apontar um diretório com o `Dockerfile` a parti do qual o Compose ira buildar a imagem para nós.
+
+Em nosso exemplo, construiremos as três partes d aplicação a parti [dessa](https://hub.docker.com/r/mjgargani/compose-example/tags)imagens disponiveis no  Docker Hub. Portanto, usaremos sempre o comando `image` para especificar cada uma delas. Nosso `docker-compose.yaml`
+ficaria assim:
+```
+version: '3'
+services:
+  frontend:
+    image: mjgargani/compose-example:frontend-trybe1.0
+  backend:
+    image: mjgargani/compose-example:backend-trybe1.0
+  database:
+    image: mjgargani/compose-example:database-trybe1.0
+```
 
 
 

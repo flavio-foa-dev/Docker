@@ -1,0 +1,8 @@
+version: '3'
+services:
+  frontend:
+    image: mjgargani/compose-example:frontend-trybe1.0
+  backend:
+    image: mjgargani/compose-example:backend-trybe1.0
+  database:
+    image: mjgargani/compose-example:database-trybe1.0
