@@ -253,6 +253,282 @@ Adicione a política de restart com o valor always aos serviços;
 Suba os serviços utilizando docker-compose e abra no terminal para validar o funcionamento.
 
 # Gabarito 3.
+Exercício 1
+Vamos aprimorar nossos conhecimentos sobre volumes e imagens.
+Para isso:
+Crie um arquivo HTML chamado missao_trybe.html que tenha a seguinte estrutura: 1.1. Tag <title> com o seguinte texto "Trybe"; 1.2. Tag <H1> com o seguinte texto "Missão da Trybe"; 1.3. Tag <p> com o seguinte texto "Gerar oportunidade para pessoas"; 1.4. Salve o arquivo em qualquer lugar da sua máquina com a extensão html
+Crie um container para manter um servidor httpd:2.4 Apache e vincule sua porta interna com a porta 4545 da sua máquina local.
+Após criar o container acesse a página HTML que está rodando no servidor em seu browser.
+Acesse o arquivo missao_trybe.html e acrescente a tag <p> com o seguinte texto "Nosso negócio é GENTE! #VQV";
+Obtenha o id do container httpd:2.4 ;
+Obtenha o Mounts através da propriedade Source que deve mostrar o volume desse container no Docker Host ;
+Agora pare o container httpd:2.4 ;
+Exclua o seu container;
+Verifique se a pasta onde você salvo o arquivo html permanece no mesmo lugar;
+Obtenha o IMAGE ID do servidor;
+Depois de obter o IMAGE ID , exclua a imagem.
+Item 1
+Crie um arquivo HTML chamado missao_trybe.html que tenha a seguinte estrutura: 1.1. Tag <title> com o seguinte texto "Trybe"; 1.2. Tag <H1> com o seguinte texto "Missão da Trybe"; 1.3. Tag <p> com o seguinte texto "Gerar oportunidade para pessoas"; 1.4. Salve o arquivo em qualquer lugar da sua máquina com a extensão html
+Solução
+Copiar
+<!DOCTYPE html>
+   <html>
+      <head>
+      <title>Trybe</title>
+   </head>
+   <body>
+      <h1>Missão da Trybe</h1>
+      <p>Gerar oportunidade para pessoas</p>
+   </body>
+</html>
+Salve esse arquivo em qualquer lugar da sua máquina com a extensão html.
+Item 2
+Crie um container para manter um servidor httpd:2.4 Apache e vincule sua porta interna com a porta 4545 da sua máquina local.
+Solução
+Copiar
+ docker run -d --name site-trybe2 -p 4545:80 -v "<CAMINHO DO DIRETÓRIO ONDE ESTÁ SEU HTML>:/usr/local/apache2/htdocs" httpd:2.4
+Item 3
+Após criar o container acesse a página HTML que está rodando no servidor em seu browser.
+Solução
+Copiar
+http://localhost:4545/primeiro-teste.html
+Item 4
+Acesse o arquivo missao_trybe.html e acrescente a tag <p> com o seguinte texto "Nosso negócio é GENTE! #VQV";
+Solução
+Copiar
+<!DOCTYPE html>
+   <html>
+      <head>
+      <title>Trybe</title>
+   </head>
+   <body>
+      <h1>Missão da Trybe</h1>
+      <p>Gerar oportunidade para pessoas</p>
+      <p>Nosso negócio é GENTE! #VQV</p>
+   </body>
+</html>
+Item 5
+Obtenha o id do container httpd:2.4 ;
+Solução
+Copiar
+docker ps
+Item 6
+Obtenha o Mounts através da propriedade Source que deve mostrar o volume desse container no Docker Host .
+Solução
+Copiar
+  docker inspect <COLOQUE AQUI SEU CONTAINER ID>
+A saída esperada em Mounts é a seguinte:
+Copiar
+"Mounts": [
+            {
+                "Type": "bind",
+                "Source": "<Endereço da sua máquina local>",
+                "Destination": "/usr/local/apache2/htdocs",
+                "Mode": "",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+Item 7
+Agora pare o container httpd:2.4 ;
+Solução
+Copiar
+ docker stop <COLOQUE AQUI SEU CONTAINER ID>
+Item 8
+Exclua o seu container;
+Solução
+Copiar
+ docker rm <COLOQUE AQUI SEU CONTAINER ID>
+Item 9
+Verifique se a pasta onde você salvo o arquivo html permanece no mesmo lugar
+Solução
+Copiar
+ cd <Endereço da sua máquina local>
+ ls -la
+Item 10
+Obtenha o IMAGE ID do servidor;
+Solução
+Copiar
+ docker images
+Item 11
+Depois de obter o IMAGE ID , exclua a imagem.
+Solução
+Copiar
+ docker rmi -f <COLOQUE AQUI SEU IMAGE ID>
+Exercício 2
+Crie o arquivo Compose para subir um ghost blog , essa plataforma é similar com o Wordpress e é utilizada para criar sites de conteúdo, você pode ler no site oficial de como criar conteúdos nele e utilizá-lo, para esse exercício utilizaremos apenas sua página de exemplo:
+Utilize a versão "3" no arquivo;
+Crie um service para subir a plataforma, utilize a imagem ghost:1-alpine ;
+Publique a porta 2368 , fazendo bind também para a 2368 ;
+Suba a aplicação utilizando o docker-compose e então acesse a porta publicada para validar se deu tudo certo.
+Solução
+Copiar
+  version: '3'
+
+  services:
+    ghost:
+      image: ghost:1-alpine
+      ports:
+        - 2368:2368
+Exercício 3
+Por padrão o ghost utiliza um sqlite interno para salvar as informações, porém, vamos alterar esse comportamento para exercitar nossos conhecimentos:
+Crie um novo serviço para o nosso banco de dados, utilize a imagem mysql:5.7 ;
+Precisamos definir uma senha root para o nosso bd , para isso utilize a variável MYSQL_ROOT_PASSWORD , lembre-se que é possível utilizar a sintaxe "${}" para passar uma env do host, para a env do container;
+Agora precisamos configurar nosso service ghost para utilizar o mysql, para isso defina a variável database__client para mysql ;
+Defina o nome ghost para o nome do database utilizando a variável database__connection__database ;
+E então, indique a conexão para o nosso mysql na env database__connection__host ;
+Para definir o usuário ( root ) e senha (a mesma que definimos no nosso mysql), utilize respectivamente as envs database__connection__user e database__connection__password .
+Utilize a opção depends_on para criar relações de dependências entre os serviços.
+Suba o ambiente com o novo arquivo usando o docker-compose e então acesse a porta.
+Solução
+Copiar
+  version: '3'
+
+  services:
+
+    ghost:
+      image: ghost:1-alpine
+      ports:
+        - 2368:2368
+      depends_on:
+        - "db"
+      environment:
+        # see https://docs.ghost.org/docs/config#section-running-ghost-with-config-env-variables
+        database__client: mysql
+        database__connection__host: db
+        database__connection__user: root
+        database__connection__password: example
+        database__connection__database: ghost
+
+    db:
+      image: mysql:5.7
+      environment:
+        MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+Exercício 4
+Agora vamos praticar os conceitos de volumes e networks .
+Configure o nosso serviço mysql para utilizar um volume, conforme vimos no conteúdo, crie o volume db-data e utilize o caminho target /var/lib/mysql .
+Ao invés de utilizar a rede padrão criada pelo Compose, defina uma rede chamada my-network para a comunicação dos dois serviços.
+Defina a política de restart para always em todos os serviços;
+Suba o ambiente com o novo arquivo usando o docker-compose e então acesse-o.
+Solução
+Copiar
+```yaml
+version: '3'
+
+services:
+
+  ghost:
+    image: ghost:1-alpine
+    restart: always
+    ports:
+      - 2368:2368
+    depends_on:
+      - "db"
+    environment:
+      # see https://docs.ghost.org/docs/config#section-running-ghost-with-config-env-variables
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: root
+      database__connection__password: example
+      database__connection__database: ghost
+    networks:
+      - my-network
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - my-network
+volumes:
+  db-data:
+
+networks:
+  my-network:
+```
+
+Para executar:
+
+```shell
+docker-compose up -d
+```
+Exercício 5
+Agora vamos criar um novo arquivo Compose, para rodarmos uma aplicação React, conforme vimos alguns exemplos do conteúdo:
+Inicie uma novo projeto ReactJS utilizando o create-react-app ;
+Crie o Dockerfile , conforme vimos na aula passada;
+Crie um novo arquivo Compose utilizando a versão 3 ;
+Defina um serviço no arquivo para nosso app , para isso utilize a opção build para apontar para o Dockerfile ;
+Publique a porta exposta no Dockerfile fazendo bind para a porta 8080 do localhost ;
+Solução
+Copiar
+  version: '3'
+
+  services:
+
+    frontend:
+      build: ./my-app
+      ports:
+        - 8080:80
+Exercício 6
+Para simularmos o processo de desenvolvimento, faça a alteração em alguma parte do código do app react , e então execute o comando para subir o serviço novamente, "rebuildando" a imagem para aplicar as alterações.
+Solução
+Copiar
+  docker-compose up --build -d
+Bônus
+Exercício 7
+Crie um arquivo Compose para subir o Wordpress com MySQL :
+Utilize a imagem wordpress:latest e mysql:5.7 ;
+Faça bind da porta 80 do container do wordpress para 8080 do host ;
+Defina as seguintes variáveis para o wordpress :
+WORDPRESS_DB_HOST: db:3306
+WORDPRESS_DB_USER: wordpress
+WORDPRESS_DB_PASSWORD: wordpress
+WORDPRESS_DB_NAME: wordpress
+Defina as seguintes variáveis para o mysql :
+MYSQL_ROOT_PASSWORD: somewordpress
+MYSQL_DATABASE: wordpress
+MYSQL_USER: wordpress
+MYSQL_PASSWORD: wordpress
+Defina o volume db_data para o mysql;
+Utilize o parâmetro depends_on para criar dependência entre os serviços;
+Adicione a política de restart com o valor always aos serviços;
+Suba os serviços utilizando docker-compose e abra no terminal para validar o funcionamento.
+Solução
+Copiar
+  version: '3.3'
+
+  services:
+    db:
+      image: mysql:5.7
+      volumes:
+        - db_data:/var/lib/mysql
+      restart: always
+      environment:
+        MYSQL_ROOT_PASSWORD: somewordpress
+        MYSQL_DATABASE: wordpress
+        MYSQL_USER: wordpress
+        MYSQL_PASSWORD: wordpress
+
+    wordpress:
+      depends_on:
+        - db
+      image: wordpress:latest
+      ports:
+        - "8000:80"
+      restart: always
+      environment:
+        WORDPRESS_DB_HOST: db:3306
+        WORDPRESS_DB_USER: wordpress
+        WORDPRESS_DB_PASSWORD: wordpress
+        WORDPRESS_DB_NAME: wordpress
+  volumes:
+      db_data: {}
+Esse exercício tem na própria documentação oficial e possui algumas considerações
+
+especiais, vale a pena dar uma olhada! 😉
 
 
 
