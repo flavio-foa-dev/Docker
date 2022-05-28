@@ -1754,7 +1754,19 @@ networks:
 
 Alguns tópicos podem agregar no seu entendimento sobre a utilização do Docker. Termos como `microsserviços` , `escalabilidade` e interação com o `Registry` são muito utilizados por quem trabalha frequentemente utilizando containerização .👩‍💻
 
-
+## Error 
+   
+   Acessando o Redis
+Se você utiliza Linux, pode ser que tenha que instalar o tools do Redis e para isso basta rodar o comando:
+   ```
+   sudo apt-get install redis-tools
+   ```
+  Para acessar o redis basta digitar em seu terminal o comando:
+   ```
+   redis-cli
+   ```
+   Dica:
+Toda vez que você desligar seu computador não será nescessário fazer todos esse procedimento novamente. Basta digitar o comando docker ps -a para poder ver os seus contâiners já criados e logo em seguida iniciá-los com o comando docker start CONTAINER_ID. O container id você irá conseguir obter quando rodar o primeiro comando.
 
 
 
